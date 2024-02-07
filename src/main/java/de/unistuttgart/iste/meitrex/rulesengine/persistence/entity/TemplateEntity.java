@@ -1,4 +1,4 @@
-package de.unistuttgart.iste.meitrex.template.persistence.entity;
+package de.unistuttgart.iste.meitrex.rulesengine.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,5 +18,4 @@ public class TemplateEntity {
 
     @Column(nullable = false, length = 255)
     private String name;
-
 }

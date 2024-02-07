@@ -1,4 +1,4 @@
-package de.unistuttgart.iste.meitrex.template.config;
+package de.unistuttgart.iste.meitrex.rulesengine.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

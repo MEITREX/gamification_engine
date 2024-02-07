@@ -1,11 +1,12 @@
 name: Building Docker Image
 
-on:
-  workflow_run:
-    workflows:
-      - Testing CI pipeline
-    types:
-      - completed
+on: workflow_dispatch
+# reenable when deployment is ready
+#  workflow_run:
+#    workflows:
+#      - Testing CI pipeline
+#    types:
+#      - completed
 
 jobs:
   docker-build:
@@ -27,5 +28,5 @@ jobs:
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: ghcr.io/it-rex-platform/template_microservice:latest
+          tags: ghcr.io/it-rex-platform/gamification-engine:latest
           push: true
