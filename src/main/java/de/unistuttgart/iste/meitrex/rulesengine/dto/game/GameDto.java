@@ -1,6 +1,6 @@
-package de.unistuttgart.iste.meitrex.rulesengine.dto;
+package de.unistuttgart.iste.meitrex.rulesengine.dto.game;
 
-import de.unistuttgart.iste.meitrex.rulesengine.model.Game;
+import de.unistuttgart.iste.meitrex.rulesengine.model.game.Game;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.vertx.core.json.JsonObject;
 import jakarta.validation.constraints.NotBlank;
@@ -10,6 +10,9 @@ import lombok.extern.jackson.Jacksonized;
 
 import java.util.*;
 
+/**
+ * DTO for {@link de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.GameEntity}
+ */
 @Schema(name = "GameDto", description = "The data transfer object for a game")
 @Value
 @With
@@ -72,4 +75,6 @@ public class GameDto implements Game {
                 .additionalData(game.getAdditionalData())
                 .build();
     }
+
+
 }

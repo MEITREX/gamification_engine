@@ -1,10 +1,10 @@
 package de.unistuttgart.iste.meitrex.rulesengine.controller;
 
 import de.unistuttgart.iste.meitrex.rulesengine.config.JsonConfiguration;
-import de.unistuttgart.iste.meitrex.rulesengine.dto.CreateOrUpdateGameDto;
-import de.unistuttgart.iste.meitrex.rulesengine.dto.GameDto;
+import de.unistuttgart.iste.meitrex.rulesengine.dto.game.CreateOrUpdateGameDto;
+import de.unistuttgart.iste.meitrex.rulesengine.dto.game.GameDto;
 import de.unistuttgart.iste.meitrex.rulesengine.exception.ResourceNotFoundException;
-import de.unistuttgart.iste.meitrex.rulesengine.service.GameService;
+import de.unistuttgart.iste.meitrex.rulesengine.service.game.GameService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -142,7 +142,7 @@ class GameControllerTest {
                 """;
 
         when(gameService.existsGame(id)).thenReturn(true);
-        when(gameService.updateGame(eq(id), any())).thenReturn(gameDto);
+        when(gameService.updateOrCreateGame(eq(id), any())).thenReturn(gameDto);
 
         mockMvc.perform(put("/api/game/" + id)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -154,7 +154,7 @@ class GameControllerTest {
         verify(gameService, times(1))
                 .existsGame(id);
         verify(gameService, times(1))
-                .updateGame(eq(id), any());
+                .updateOrCreateGame(eq(id), any());
     }
 
 
@@ -168,7 +168,7 @@ class GameControllerTest {
                 """;
 
         when(gameService.existsGame(id)).thenReturn(false);
-        when(gameService.createGame(any())).thenReturn(GameDto.builder()
+        when(gameService.updateOrCreateGame(eq(id), any())).thenReturn(GameDto.builder()
                 .id(id)
                 .name("Updated Test Game")
                 .build());
@@ -183,7 +183,7 @@ class GameControllerTest {
         verify(gameService, times(1))
                 .existsGame(id);
         verify(gameService, times(1))
-                .createGame(any());
+                .updateOrCreateGame(eq(id), any());
     }
 
     @Test

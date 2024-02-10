@@ -1,6 +1,6 @@
-package de.unistuttgart.iste.meitrex.rulesengine.dto;
+package de.unistuttgart.iste.meitrex.rulesengine.dto.game;
 
-import de.unistuttgart.iste.meitrex.rulesengine.model.Player;
+import de.unistuttgart.iste.meitrex.rulesengine.model.game.Player;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.vertx.core.json.JsonObject;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +9,9 @@ import lombok.extern.jackson.Jacksonized;
 
 import java.util.*;
 
+/**
+ * DTO for {@link de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.PlayerEntity}
+ */
 @Schema(name = "PlayerDto", description = "The data transfer object for a player")
 @Value
 @RequiredArgsConstructor

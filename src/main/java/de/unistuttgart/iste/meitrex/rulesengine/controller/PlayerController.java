@@ -1,9 +1,9 @@
 package de.unistuttgart.iste.meitrex.rulesengine.controller;
 
-import de.unistuttgart.iste.meitrex.rulesengine.dto.CreatePlayerDto;
-import de.unistuttgart.iste.meitrex.rulesengine.dto.PlayerDto;
+import de.unistuttgart.iste.meitrex.rulesengine.dto.game.CreatePlayerDto;
+import de.unistuttgart.iste.meitrex.rulesengine.dto.game.PlayerDto;
 import de.unistuttgart.iste.meitrex.rulesengine.exception.SpringErrorPayload;
-import de.unistuttgart.iste.meitrex.rulesengine.service.PlayerService;
+import de.unistuttgart.iste.meitrex.rulesengine.service.game.PlayerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -46,7 +46,7 @@ public class PlayerController {
     public PlayerDto addPlayerToGame(
             @PathVariable("gameId") @Parameter(description = "id of the game") UUID gameId,
             @RequestBody CreatePlayerDto playerDto) {
-        return playerService.createPlayer(playerDto);
+        return playerService.createPlayer(gameId, playerDto);
     }
 
     @Operation(summary = "Get all players of a game")
@@ -56,7 +56,7 @@ public class PlayerController {
     @GetMapping(value = "/api/{gameId}/player", produces = "application/json")
     public List<PlayerDto> getAllPlayers(
             @PathVariable("gameId") @Parameter(description = "id of the game") UUID gameId) {
-        return playerService.getAllPlayers(gameId);
+        return playerService.getAllPlayersOfGame(gameId);
     }
 
     @Operation(summary = "Get a player by its ID")
@@ -87,6 +87,5 @@ public class PlayerController {
             @PathVariable("playerId") @Parameter(description = "id of the player") UUID playerId) {
         playerService.deletePlayer(gameId, playerId);
     }
-
 
 }

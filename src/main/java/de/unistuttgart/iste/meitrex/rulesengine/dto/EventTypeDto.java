@@ -15,8 +15,8 @@ import lombok.extern.jackson.Jacksonized;
 @With
 @Jacksonized
 @Builder(toBuilder = true)
-@RequiredArgsConstructor
-public class GameEventTypeDto implements GameEventType {
+@AllArgsConstructor
+public class EventTypeDto implements GameEventType {
 
     @Schema(description = "The name of the event type. Must be unique and only contain uppercase letters and underscores.",
             example = "PLAYER_JOINED",
@@ -65,8 +65,8 @@ public class GameEventTypeDto implements GameEventType {
     }
 
     @NotNull
-    public static GameEventTypeDto from(@NotNull GameEventType gameEventType) {
-        return GameEventTypeDto.builder()
+    public static EventTypeDto from(@NotNull GameEventType gameEventType) {
+        return EventTypeDto.builder()
                 .identifier(gameEventType.getIdentifier())
                 .description(gameEventType.getDescription())
                 .defaultScope(gameEventType.getDefaultScope())

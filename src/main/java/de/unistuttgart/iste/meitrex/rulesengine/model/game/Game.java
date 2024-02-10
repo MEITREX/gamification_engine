@@ -1,5 +1,6 @@
-package de.unistuttgart.iste.meitrex.rulesengine.model;
+package de.unistuttgart.iste.meitrex.rulesengine.model.game;
 
+import de.unistuttgart.iste.meitrex.rulesengine.model.IWithCustomData;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;

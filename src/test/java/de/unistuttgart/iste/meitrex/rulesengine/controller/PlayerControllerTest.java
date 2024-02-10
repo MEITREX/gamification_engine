@@ -1,10 +1,10 @@
 package de.unistuttgart.iste.meitrex.rulesengine.controller;
 
 import de.unistuttgart.iste.meitrex.rulesengine.config.JsonConfiguration;
-import de.unistuttgart.iste.meitrex.rulesengine.dto.GameDto;
-import de.unistuttgart.iste.meitrex.rulesengine.dto.PlayerDto;
+import de.unistuttgart.iste.meitrex.rulesengine.dto.game.GameDto;
+import de.unistuttgart.iste.meitrex.rulesengine.dto.game.PlayerDto;
 import de.unistuttgart.iste.meitrex.rulesengine.exception.ResourceNotFoundException;
-import de.unistuttgart.iste.meitrex.rulesengine.service.PlayerService;
+import de.unistuttgart.iste.meitrex.rulesengine.service.game.PlayerService;
 import io.vertx.core.json.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,7 +62,7 @@ class PlayerControllerTest {
                 }
                 """;
 
-        when(playerService.createPlayer(any())).thenReturn(playerDto);
+        when(playerService.createPlayer(eq(gameId), any())).thenReturn(playerDto);
 
         mockMvc.perform(post("/api/" + gameId + "/player")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -77,7 +77,7 @@ class PlayerControllerTest {
                 .andExpect(jsonPath("$.additionalData", hasToString("{}")))
                 .andExpect(jsonPath("$.scores", aMapWithSize(0)));
 
-        verify(playerService, times(1)).createPlayer(any());
+        verify(playerService, times(1)).createPlayer(eq(gameId), any());
     }
 
     @Test
@@ -94,7 +94,7 @@ class PlayerControllerTest {
                         .build()
         );
 
-        when(playerService.getAllPlayers(gameId)).thenReturn(playerDtoList);
+        when(playerService.getAllPlayersOfGame(gameId)).thenReturn(playerDtoList);
 
         mockMvc.perform(get("/api/" + gameId + "/player")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -104,7 +104,7 @@ class PlayerControllerTest {
                 .andExpect(jsonPath("$[0].name", is("Test Player 1")))
                 .andExpect(jsonPath("$[1].name", is("Test Player 2")));
 
-        verify(playerService, times(1)).getAllPlayers(gameId);
+        verify(playerService, times(1)).getAllPlayersOfGame(gameId);
     }
 
     @Test

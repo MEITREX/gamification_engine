@@ -1,10 +1,10 @@
 package de.unistuttgart.iste.meitrex.rulesengine.controller;
 
 import de.unistuttgart.iste.meitrex.rulesengine.config.JsonConfiguration;
-import de.unistuttgart.iste.meitrex.rulesengine.dto.GameEventTypeDto;
+import de.unistuttgart.iste.meitrex.rulesengine.dto.EventTypeDto;
 import de.unistuttgart.iste.meitrex.rulesengine.exception.ResourceNotFoundException;
 import de.unistuttgart.iste.meitrex.rulesengine.model.event.GameEventScope;
-import de.unistuttgart.iste.meitrex.rulesengine.service.GameEventTypeService;
+import de.unistuttgart.iste.meitrex.rulesengine.service.EventTypeService;
 import io.vertx.core.json.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,10 +25,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-class GameEventTypeControllerTest {
+class EventTypeControllerTest {
 
     @Mock
-    private GameEventTypeService gameEventTypeService;
+    private EventTypeService gameEventTypeService;
 
     @InjectMocks
     private GameEventTypeController gameEventTypeController;
@@ -38,7 +38,6 @@ class GameEventTypeControllerTest {
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(gameEventTypeController)
-                // Add the custom JSON serializer and deserializer to the message converters
                 .setMessageConverters(new MappingJackson2HttpMessageConverter(JsonConfiguration.createObjectMapper()))
                 .build();
     }
@@ -48,7 +47,7 @@ class GameEventTypeControllerTest {
      */
     @Test
     void testCreateGameEventType() throws Exception {
-        GameEventTypeDto gameEventTypeDto = GameEventTypeDto.builder()
+        EventTypeDto gameEventTypeDto = EventTypeDto.builder()
                 .identifier("TEST_EVENT")
                 .description("Test event type")
                 .eventSchema(new JsonObject("{\"type\": \"object\"}"))
@@ -65,7 +64,7 @@ class GameEventTypeControllerTest {
                 }
                 """;
 
-        when(gameEventTypeService.createGameEventType(Mockito.any(GameEventTypeDto.class)))
+        when(gameEventTypeService.createGameEventType(Mockito.any(EventTypeDto.class)))
                 .thenReturn(gameEventTypeDto);
 
         mockMvc.perform(post("/api/eventType")
@@ -142,14 +141,14 @@ class GameEventTypeControllerTest {
                 }
                 """;
 
-        GameEventTypeDto gameEventTypeDto = GameEventTypeDto.builder()
+        EventTypeDto gameEventTypeDto = EventTypeDto.builder()
                 .identifier("TEST_EVENT")
                 .description("")
                 .defaultScope(GameEventScope.GAME)
                 .eventSchema(new JsonObject())
                 .build();
 
-        when(gameEventTypeService.createGameEventType(Mockito.any(GameEventTypeDto.class)))
+        when(gameEventTypeService.createGameEventType(Mockito.any(EventTypeDto.class)))
                 .thenReturn(gameEventTypeDto);
 
         mockMvc.perform(post("/api/eventType")
@@ -170,14 +169,14 @@ class GameEventTypeControllerTest {
      */
     @Test
     void testGetAllGameEventTypes() throws Exception {
-        List<GameEventTypeDto> gameEventTypeDtoList = List.of(
-                GameEventTypeDto.builder()
+        List<EventTypeDto> gameEventTypeDtoList = List.of(
+                EventTypeDto.builder()
                         .identifier("TEST_EVENT_A")
                         .description("Test event type 1")
                         .eventSchema(new JsonObject("{\"type\": \"object\"}"))
                         .defaultScope(GameEventScope.GAME)
                         .build(),
-                GameEventTypeDto.builder()
+                EventTypeDto.builder()
                         .identifier("TEST_EVENT_B")
                         .description("Test event type 2")
                         .eventSchema(new JsonObject("{\"type\": \"object\"}"))
@@ -208,7 +207,7 @@ class GameEventTypeControllerTest {
     void testGetGameEventTypeById() throws Exception {
         // Arrange
         String id = "TEST_EVENT";
-        GameEventTypeDto gameEventTypeDto = GameEventTypeDto.builder()
+        EventTypeDto gameEventTypeDto = EventTypeDto.builder()
                 .identifier(id)
                 .description("Test event type 1")
                 .eventSchema(new JsonObject("{\"type\": \"object\"}"))
@@ -247,7 +246,7 @@ class GameEventTypeControllerTest {
     void testUpdateGameEventType() throws Exception {
         // Arrange
         String id = "TEST_EVENT";
-        GameEventTypeDto gameEventTypeDto = GameEventTypeDto.builder()
+        EventTypeDto gameEventTypeDto = EventTypeDto.builder()
                 .identifier(id)
                 .description("Updated test event type")
                 .eventSchema(new JsonObject("{\"type\": \"object\"}"))
@@ -289,7 +288,7 @@ class GameEventTypeControllerTest {
     void testUpdateGameEventTypeNotExistingYet() throws Exception {
         // Arrange
         String id = "TEST_EVENT";
-        GameEventTypeDto gameEventTypeDto = GameEventTypeDto.builder()
+        EventTypeDto gameEventTypeDto = EventTypeDto.builder()
                 .identifier(id)
                 .description("Updated test event type")
                 .eventSchema(new JsonObject("{\"type\": \"object\"}"))
@@ -306,7 +305,7 @@ class GameEventTypeControllerTest {
                 """;
 
         when(gameEventTypeService.existsGameEventType(id)).thenReturn(false);
-        when(gameEventTypeService.createGameEventType(any())).thenReturn(gameEventTypeDto);
+        when(gameEventTypeService.updateGameEventType(eq(id), any())).thenReturn(gameEventTypeDto);
 
         // Act and Assert
         mockMvc.perform(put("/api/eventType/" + id)
@@ -322,8 +321,6 @@ class GameEventTypeControllerTest {
         verify(gameEventTypeService, times(1))
                 .existsGameEventType(id);
         verify(gameEventTypeService, times(1))
-                .createGameEventType(any());
-        verify(gameEventTypeService, never())
                 .updateGameEventType(eq(id), any());
     }
 
@@ -335,7 +332,7 @@ class GameEventTypeControllerTest {
     void testUpdateGameEventTypeWithNewInvalidIdentifier() throws Exception {
         // Arrange
         String id = "TEST_EVENT";
-        GameEventTypeDto gameEventTypeDto = GameEventTypeDto.builder()
+        EventTypeDto gameEventTypeDto = EventTypeDto.builder()
                 .identifier(id)
                 .description("Updated test event type")
                 .eventSchema(new JsonObject("{\"type\": \"object\"}"))
@@ -353,7 +350,7 @@ class GameEventTypeControllerTest {
                 """;
 
         when(gameEventTypeService.existsGameEventType(id)).thenReturn(false);
-        when(gameEventTypeService.createGameEventType(any())).thenReturn(gameEventTypeDto);
+        when(gameEventTypeService.updateGameEventType(eq(id), any())).thenReturn(gameEventTypeDto);
 
         // Act and Assert
         mockMvc.perform(put("/api/eventType/" + id)
@@ -369,8 +366,6 @@ class GameEventTypeControllerTest {
         verify(gameEventTypeService, times(1))
                 .existsGameEventType(id);
         verify(gameEventTypeService, times(1))
-                .createGameEventType(any());
-        verify(gameEventTypeService, never())
                 .updateGameEventType(eq(id), any());
     }
 

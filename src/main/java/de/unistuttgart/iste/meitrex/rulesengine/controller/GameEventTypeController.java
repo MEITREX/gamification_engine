@@ -1,8 +1,8 @@
 package de.unistuttgart.iste.meitrex.rulesengine.controller;
 
-import de.unistuttgart.iste.meitrex.rulesengine.dto.GameEventTypeDto;
+import de.unistuttgart.iste.meitrex.rulesengine.dto.EventTypeDto;
 import de.unistuttgart.iste.meitrex.rulesengine.exception.SpringErrorPayload;
-import de.unistuttgart.iste.meitrex.rulesengine.service.GameEventTypeService;
+import de.unistuttgart.iste.meitrex.rulesengine.service.EventTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GameEventTypeController {
 
-    private final GameEventTypeService gameEventTypeService;
+    private final EventTypeService gameEventTypeService;
 
     @Operation(
             summary = "Create a new game event type",
@@ -43,8 +43,8 @@ public class GameEventTypeController {
     @ApiResponse(responseCode = "500", description = "Server error",
             content = @Content(schema = @Schema(implementation = SpringErrorPayload.class)))
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public GameEventTypeDto createGameEventType(
-            @RequestBody @Valid GameEventTypeDto gameEventTypeDto) {
+    public EventTypeDto createGameEventType(
+            @RequestBody @Valid EventTypeDto gameEventTypeDto) {
         return gameEventTypeService.createGameEventType(gameEventTypeDto);
     }
 
@@ -53,7 +53,7 @@ public class GameEventTypeController {
     @ApiResponse(responseCode = "500", description = "Server error",
             content = @Content(schema = @Schema(implementation = SpringErrorPayload.class)))
     @GetMapping(produces = "application/json")
-    public List<GameEventTypeDto> getAllGameEventTypes() {
+    public List<EventTypeDto> getAllGameEventTypes() {
         return gameEventTypeService.getAllGameEventTypes();
     }
 
@@ -64,7 +64,7 @@ public class GameEventTypeController {
     @ApiResponse(responseCode = "500", description = "Server error",
             content = @Content(schema = @Schema(implementation = SpringErrorPayload.class)))
     @GetMapping(path = "/{id}", produces = "application/json")
-    public GameEventTypeDto getGameEventTypeById(
+    public EventTypeDto getGameEventTypeById(
             @PathVariable("id")
             @Parameter(description = "The unique identifier of the event type", example = "UNKNOWN")
             String id
@@ -76,19 +76,21 @@ public class GameEventTypeController {
     @ApiResponse(responseCode = "200", description = "Game event type updated successfully")
     @ApiResponse(responseCode = "201", description = "Game event type created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input")
+    @ApiResponse(responseCode = "403", description = "Predefined event types cannot be updated",
+            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class)))
     @ApiResponse(responseCode = "500", description = "Server error",
             content = @Content(schema = @Schema(implementation = SpringErrorPayload.class)))
     @PutMapping(path = "/{id}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<GameEventTypeDto> updateGameEventType(
+    public ResponseEntity<EventTypeDto> updateGameEventType(
             @PathVariable("id") @Parameter(description = "Identifier of the event type") String id,
-            @RequestBody GameEventTypeDto gameEventTypeDto
+            @RequestBody EventTypeDto gameEventTypeDto
     ) {
-        if (!gameEventTypeService.existsGameEventType(id)) {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(gameEventTypeService.createGameEventType(gameEventTypeDto));
-        }
+        var responseStatus = gameEventTypeService.existsGameEventType(id)
+                ? HttpStatus.OK
+                : HttpStatus.CREATED;
 
-        return ResponseEntity.ok(gameEventTypeService.updateGameEventType(id, gameEventTypeDto));
+        return ResponseEntity.status(responseStatus)
+                .body(gameEventTypeService.updateGameEventType(id, gameEventTypeDto));
     }
 
     @Operation(summary = "Delete a game event type by its ID. All game events of this type will get the UNKNOWN type.")
@@ -96,6 +98,10 @@ public class GameEventTypeController {
             responseCode = "204",
             description = "Game event type deleted successfully or game event type did not exist"
     )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Predefined event types cannot be deleted",
+            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class)))
     @ApiResponse(
             responseCode = "500",
             description = "Server error",

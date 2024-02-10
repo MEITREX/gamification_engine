@@ -1,9 +1,9 @@
 package de.unistuttgart.iste.meitrex.rulesengine.controller;
 
-import de.unistuttgart.iste.meitrex.rulesengine.dto.CreateOrUpdateGameDto;
-import de.unistuttgart.iste.meitrex.rulesengine.dto.GameDto;
+import de.unistuttgart.iste.meitrex.rulesengine.dto.game.CreateOrUpdateGameDto;
+import de.unistuttgart.iste.meitrex.rulesengine.dto.game.GameDto;
 import de.unistuttgart.iste.meitrex.rulesengine.exception.SpringErrorPayload;
-import de.unistuttgart.iste.meitrex.rulesengine.service.GameService;
+import de.unistuttgart.iste.meitrex.rulesengine.service.game.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -85,12 +85,9 @@ public class GameController {
             @PathVariable("id") @Parameter(description = "Identifier of the game") UUID id,
             @RequestBody CreateOrUpdateGameDto gameDto
     ) {
-        if (!gameService.existsGame(id)) {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(gameService.createGame(gameDto));
-        }
+        HttpStatus responseStatus = gameService.existsGame(id) ? HttpStatus.OK : HttpStatus.CREATED;
 
-        return ResponseEntity.ok(gameService.updateGame(id, gameDto));
+        return ResponseEntity.status(responseStatus).body(gameService.updateOrCreateGame(id, gameDto));
     }
 
     @Operation(summary = "Delete a game by its ID.")

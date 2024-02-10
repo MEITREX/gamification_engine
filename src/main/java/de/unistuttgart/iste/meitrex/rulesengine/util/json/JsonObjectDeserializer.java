@@ -18,4 +18,8 @@ public class JsonObjectDeserializer extends StdDeserializer<JsonObject> {
             throws IOException {
         return new JsonObject(jsonParser.readValueAsTree().toString());
     }
+
+    public JsonObject deserialize(String s) {
+        return new JsonObject(s);
+    }
 }

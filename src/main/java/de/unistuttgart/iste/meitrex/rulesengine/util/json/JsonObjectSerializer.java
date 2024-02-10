@@ -23,6 +23,10 @@ public class JsonObjectSerializer extends StdSerializer<JsonObject> {
             JsonGenerator jsonGenerator,
             SerializerProvider serializerProvider)
             throws IOException {
-        jsonGenerator.writeRawValue(jsonObject.encode());
+        jsonGenerator.writeRawValue(encode(jsonObject));
+    }
+
+    public String encode(JsonObject jsonObject) {
+        return jsonObject.encode();
     }
 }
