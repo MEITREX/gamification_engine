@@ -1,12 +1,13 @@
 package de.unistuttgart.iste.meitrex.rulesengine.service;
 
-import de.unistuttgart.iste.meitrex.rulesengine.dto.EventTypeDto;
+import de.unistuttgart.iste.meitrex.rulesengine.dto.event.EventTypeDto;
 import de.unistuttgart.iste.meitrex.rulesengine.exception.*;
 import de.unistuttgart.iste.meitrex.rulesengine.matcher.EventTypeMatcher;
-import de.unistuttgart.iste.meitrex.rulesengine.model.event.GameEventScope;
-import de.unistuttgart.iste.meitrex.rulesengine.model.event.GameEventType;
+import de.unistuttgart.iste.meitrex.rulesengine.model.event.EventType;
+import de.unistuttgart.iste.meitrex.rulesengine.model.event.EventVisibility;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.EventTypeEntity;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.EventTypeRepository;
+import de.unistuttgart.iste.meitrex.rulesengine.service.event.EventTypeService;
 import de.unistuttgart.iste.meitrex.rulesengine.service.event.PredefinedEventTypes;
 import io.vertx.core.json.JsonObject;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ class GameEventTypeServiceTest {
         when(eventTypeRepository.findById(inputDto.getIdentifier())).thenReturn(Optional.empty());
         when(eventTypeRepository.save(any())).thenAnswer(returnsFirstArg());
 
-        EventTypeDto result = eventTypeService.createGameEventType(inputDto);
+        EventTypeDto result = eventTypeService.createEventType(inputDto);
 
         assertThat(result, is(sameEventTypeAs(inputDto)));
 
@@ -56,7 +57,7 @@ class GameEventTypeServiceTest {
 
         when(eventTypeRepository.findById(inputDto.getIdentifier())).thenReturn(Optional.of(getTestEventTypeEntity()));
 
-        assertThrows(ResourceAlreadyExistsException.class, () -> eventTypeService.createGameEventType(inputDto));
+        assertThrows(ResourceAlreadyExistsException.class, () -> eventTypeService.createEventType(inputDto));
 
         verify(eventTypeRepository, times(1)).findById(inputDto.getIdentifier());
         verify(eventTypeRepository, never()).save(any());
@@ -161,9 +162,8 @@ class GameEventTypeServiceTest {
         verify(eventTypeRepository, times(2)).findById(id);
 
         String predefinedId = getPredefinedEventType().getIdentifier();
-        when(eventTypeRepository.findById(predefinedId)).thenReturn(Optional.empty());
         assertThat(eventTypeService.existsGameEventType(getPredefinedEventType().getIdentifier()), is(true));
-        verify(eventTypeRepository, times(1)).findById(predefinedId);
+        verify(eventTypeRepository, never()).findById(predefinedId);
     }
 
     private EventTypeEntity getTestEventTypeEntity() {
@@ -171,10 +171,10 @@ class GameEventTypeServiceTest {
                 .setIdentifier("TEST")
                 .setDescription("Test Event Type")
                 .setEventSchema(JsonObject.of("type", "object"))
-                .setDefaultScope(GameEventScope.GAME);
+                .setDefaultVisibility(EventVisibility.GAME);
     }
 
-    private GameEventType getPredefinedEventType() {
+    private EventType getPredefinedEventType() {
         return PredefinedEventTypes.getAll().stream().findAny().orElseThrow();
     }
 
@@ -183,7 +183,7 @@ class GameEventTypeServiceTest {
                 .identifier("TEST")
                 .description("Test Event Type")
                 .eventSchema(JsonObject.of("type", "object"))
-                .defaultScope(GameEventScope.GAME)
+                .defaultVisibility(EventVisibility.GAME)
                 .build();
     }
 }

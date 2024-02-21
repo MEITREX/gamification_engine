@@ -1,5 +1,6 @@
 package de.unistuttgart.iste.meitrex.rulesengine.persistence;
 
+import de.unistuttgart.iste.meitrex.rulesengine.exception.ResourceNotFoundException;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.*;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.GameRepository;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.PlayerRepository;
@@ -15,9 +16,12 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.*;
 
+import static de.unistuttgart.iste.meitrex.rulesengine.matcher.GameMatcher.sameGameAs;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests that game entities can be saved and deleted.
@@ -45,16 +49,9 @@ class GameRepositoryTest {
 
         gameRepository.save(gameEntity);
 
-        GameEntity createdGameEntity = gameRepository.findById(gameEntity.getId()).orElseThrow();
+        GameEntity createdGameEntity = gameRepository.findByIdOrThrow(gameEntity.getId());
 
-        assertThat(createdGameEntity.getId(), is(gameEntity.getId()));
-        assertThat(createdGameEntity.getName(), is("Test Game"));
-        assertThat(createdGameEntity.getFlags(), containsInAnyOrder("flag1", "flag2"));
-        assertThat(createdGameEntity.getScores(), allOf(
-                hasEntry("score1", 1),
-                hasEntry("score2", 2)
-        ));
-        assertThat(createdGameEntity.getAdditionalData().encode(), is("{\"key\":\"value\",\"key2\":\"value2\"}"));
+        assertThat(createdGameEntity, is(sameGameAs(gameEntity)));
     }
 
     @Test
@@ -100,5 +97,12 @@ class GameRepositoryTest {
 
         assertThat(playerRepository.findAll(), empty());
         assertThat(gameRepository.findAll(), empty());
+    }
+
+    @Test
+    void testGetGameByIdNotFound() {
+        UUID id = UUID.randomUUID();
+
+        assertThrows(ResourceNotFoundException.class, () -> gameRepository.findByIdOrThrow(id));
     }
 }

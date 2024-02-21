@@ -1,6 +1,7 @@
-package de.unistuttgart.iste.meitrex.rulesengine.dto;
+package de.unistuttgart.iste.meitrex.rulesengine.dto.event;
 
-import de.unistuttgart.iste.meitrex.rulesengine.model.event.GameEventScope;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.unistuttgart.iste.meitrex.rulesengine.model.event.EventVisibility;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.vertx.core.json.JsonObject;
 import jakarta.annotation.Nullable;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Schema(name = "CreateGameEventDto",
@@ -23,30 +25,21 @@ public class CreateGameEventDto {
             example = "player_joined",
             requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull
-    @NotBlank String eventType;
+    @NotBlank
+    String eventType;
 
-    @Schema(description = "The unique identifier of the game the event belongs to",
-            example = "123e4567-e89b-12d3-a456-426614174000",
+    @Schema(description = "The visibility of the event. The visibility determines who can see the event." +
+                          "If not set, the default visibility of the event type is used.",
+            example = "GAME",
             requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
     @Nullable
-    UUID gameId;
+    EventVisibility visibility;
 
     @Schema(description = "The unique identifier of the player the event belongs to",
             example = "123e4567-e89b-12d3-a456-426614174000",
             requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
     @Nullable
     UUID playerId;
-
-    @Schema(description = "The unique identifier of the group the event belongs to",
-            example = "123e4567-e89b-12d3-a456-426614174000",
-            requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
-    @Nullable
-    UUID groupId;
-
-    @Schema(description = "The scope of the event. If not set, this will automatically determined by the event type and the presence of the player or group id. If set, the player or group id will be ignored.",
-            example = "GAME",
-            requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = false)
-    @NotNull GameEventScope scope;
 
     @Schema(description = "The unique identifier of the parent event. If set, this event is a sub-event of the parent event. If not set, this event is a root event.",
             example = "123e4567-e89b-12d3-a456-426614174000",
@@ -61,5 +54,25 @@ public class CreateGameEventDto {
             implementation = Object.class)
     @Nullable
     JsonObject data;
+
+    @JsonIgnore
+    public Optional<UUID> getOptionalPlayerId() {
+        return Optional.ofNullable(playerId);
+    }
+
+    @JsonIgnore
+    public Optional<UUID> getOptionalParentEventId() {
+        return Optional.ofNullable(parentEventId);
+    }
+
+    @JsonIgnore
+    public Optional<JsonObject> getOptionalData() {
+        return Optional.ofNullable(data);
+    }
+
+    @JsonIgnore
+    public Optional<EventVisibility> getOptionalVisibility() {
+        return Optional.ofNullable(visibility);
+    }
 
 }

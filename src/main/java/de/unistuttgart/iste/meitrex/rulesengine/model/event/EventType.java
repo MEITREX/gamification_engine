@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 /**
  * Represents a type of game event.
  */
-public interface GameEventType extends IWithJsonSchema {
+public interface EventType extends IWithJsonSchema {
 
     /**
      * Returns the unique name of the event type.
@@ -21,9 +21,13 @@ public interface GameEventType extends IWithJsonSchema {
     String getDescription();
 
     /**
-     * Returns the default scope of events of this type.
-     * This scope is used when the scope is not explicitly set for an event.
+     * Returns the default visibility of events of this type.
+     * This visibility is used when the visibility is not explicitly set for an event.
      */
     @NotNull
-    GameEventScope getDefaultScope();
+    EventVisibility getDefaultVisibility();
+
+
+    @NotNull
+    ActionOnEvent getAction();
 }

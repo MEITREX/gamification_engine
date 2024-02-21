@@ -1,10 +1,10 @@
 package de.unistuttgart.iste.meitrex.rulesengine.controller;
 
 import de.unistuttgart.iste.meitrex.rulesengine.config.JsonConfiguration;
-import de.unistuttgart.iste.meitrex.rulesengine.dto.EventTypeDto;
+import de.unistuttgart.iste.meitrex.rulesengine.dto.event.EventTypeDto;
 import de.unistuttgart.iste.meitrex.rulesengine.exception.ResourceNotFoundException;
-import de.unistuttgart.iste.meitrex.rulesengine.model.event.GameEventScope;
-import de.unistuttgart.iste.meitrex.rulesengine.service.EventTypeService;
+import de.unistuttgart.iste.meitrex.rulesengine.model.event.EventVisibility;
+import de.unistuttgart.iste.meitrex.rulesengine.service.event.EventTypeService;
 import io.vertx.core.json.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ class EventTypeControllerTest {
     private EventTypeService gameEventTypeService;
 
     @InjectMocks
-    private GameEventTypeController gameEventTypeController;
+    private EventTypeController gameEventTypeController;
 
     private MockMvc mockMvc;
 
@@ -51,34 +51,33 @@ class EventTypeControllerTest {
                 .identifier("TEST_EVENT")
                 .description("Test event type")
                 .eventSchema(new JsonObject("{\"type\": \"object\"}"))
-                .defaultScope(GameEventScope.GAME)
+                .defaultVisibility(EventVisibility.GAME)
                 .build();
         String eventJson = """
                 {
                     "identifier": "TEST_EVENT",
                     "description": "Test event type",
-                    "defaultScope": "GAME",
+                    "defaultVisibility": "GAME",
                     "eventSchema": {
                         "type": "object"
                     }
                 }
                 """;
 
-        when(gameEventTypeService.createGameEventType(Mockito.any(EventTypeDto.class)))
+        when(gameEventTypeService.createEventType(Mockito.any(EventTypeDto.class)))
                 .thenReturn(gameEventTypeDto);
 
         mockMvc.perform(post("/api/eventType")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(eventJson))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.identifier", is("TEST_EVENT")))
                 .andExpect(jsonPath("$.description", is("Test event type")))
-                .andExpect(jsonPath("$.defaultScope", is("GAME")))
+                .andExpect(jsonPath("$.defaultVisibility", is("GAME")))
                 .andExpect(jsonPath("$.eventSchema.type", is("object")));
 
-        verify(gameEventTypeService, times(1))
-                .createGameEventType(any());
+        verify(gameEventTypeService, times(1)).createEventType(any());
     }
 
     /**
@@ -90,7 +89,7 @@ class EventTypeControllerTest {
                 {
                     "identifier": "invalid identifier",
                     "description": "Test event type",
-                    "defaultScope": "GAME",
+                    "defaultVisibility": "GAME",
                     "eventSchema": {
                         "type": "object"
                     }
@@ -103,7 +102,7 @@ class EventTypeControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(gameEventTypeService, never())
-                .createGameEventType(any());
+                .createEventType(any());
     }
 
     /**
@@ -114,7 +113,7 @@ class EventTypeControllerTest {
         String eventJson = """
                 {
                     "description": "Test event type",
-                    "defaultScope": "GAME",
+                    "defaultVisibility": "GAME",
                     "eventSchema": {
                         "type": "object"
                     }
@@ -127,7 +126,7 @@ class EventTypeControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(gameEventTypeService, never())
-                .createGameEventType(any());
+                .createEventType(any());
     }
 
     /**
@@ -144,24 +143,24 @@ class EventTypeControllerTest {
         EventTypeDto gameEventTypeDto = EventTypeDto.builder()
                 .identifier("TEST_EVENT")
                 .description("")
-                .defaultScope(GameEventScope.GAME)
+                .defaultVisibility(EventVisibility.GAME)
                 .eventSchema(new JsonObject())
                 .build();
 
-        when(gameEventTypeService.createGameEventType(Mockito.any(EventTypeDto.class)))
+        when(gameEventTypeService.createEventType(Mockito.any(EventTypeDto.class)))
                 .thenReturn(gameEventTypeDto);
 
         mockMvc.perform(post("/api/eventType")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(eventJson))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.identifier", is("TEST_EVENT")))
                 .andExpect(jsonPath("$.description", is("")))
-                .andExpect(jsonPath("$.defaultScope", is("GAME")))
+                .andExpect(jsonPath("$.defaultVisibility", is("GAME")))
                 .andExpect(jsonPath("$.eventSchema", hasToString("{}")));
 
         verify(gameEventTypeService, times(1))
-                .createGameEventType(any());
+                .createEventType(any());
     }
 
     /**
@@ -174,13 +173,13 @@ class EventTypeControllerTest {
                         .identifier("TEST_EVENT_A")
                         .description("Test event type 1")
                         .eventSchema(new JsonObject("{\"type\": \"object\"}"))
-                        .defaultScope(GameEventScope.GAME)
+                        .defaultVisibility(EventVisibility.GAME)
                         .build(),
                 EventTypeDto.builder()
                         .identifier("TEST_EVENT_B")
                         .description("Test event type 2")
                         .eventSchema(new JsonObject("{\"type\": \"object\"}"))
-                        .defaultScope(GameEventScope.GAME)
+                        .defaultVisibility(EventVisibility.GAME)
                         .build()
         );
 
@@ -193,11 +192,11 @@ class EventTypeControllerTest {
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].identifier", is("TEST_EVENT_A")))
                 .andExpect(jsonPath("$[0].description", is("Test event type 1")))
-                .andExpect(jsonPath("$[0].defaultScope", is("GAME")))
+                .andExpect(jsonPath("$[0].defaultVisibility", is("GAME")))
                 .andExpect(jsonPath("$[0].eventSchema.type", is("object")))
                 .andExpect(jsonPath("$[1].identifier", is("TEST_EVENT_B")))
                 .andExpect(jsonPath("$[1].description", is("Test event type 2")))
-                .andExpect(jsonPath("$[1].defaultScope", is("GAME")))
+                .andExpect(jsonPath("$[1].defaultVisibility", is("GAME")))
                 .andExpect(jsonPath("$[1].eventSchema.type", is("object")));
 
         verify(gameEventTypeService, times(1)).getAllGameEventTypes();
@@ -211,7 +210,7 @@ class EventTypeControllerTest {
                 .identifier(id)
                 .description("Test event type 1")
                 .eventSchema(new JsonObject("{\"type\": \"object\"}"))
-                .defaultScope(GameEventScope.GAME)
+                .defaultVisibility(EventVisibility.GAME)
                 .build();
 
         when(gameEventTypeService.getGameEventTypeById(id)).thenReturn(gameEventTypeDto);
@@ -223,7 +222,7 @@ class EventTypeControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.identifier", is(id)))
                 .andExpect(jsonPath("$.description", is("Test event type 1")))
-                .andExpect(jsonPath("$.defaultScope", is("GAME")))
+                .andExpect(jsonPath("$.defaultVisibility", is("GAME")))
                 .andExpect(jsonPath("$.eventSchema.type", is("object")));
 
         verify(gameEventTypeService, times(1)).getGameEventTypeById(id);
@@ -250,12 +249,13 @@ class EventTypeControllerTest {
                 .identifier(id)
                 .description("Updated test event type")
                 .eventSchema(new JsonObject("{\"type\": \"object\"}"))
-                .defaultScope(GameEventScope.GAME)
+                .defaultVisibility(EventVisibility.GAME)
                 .build();
         String json = """
                 {
+                    "identifier": "TEST_EVENT",
                     "description": "Updated test event type",
-                    "defaultScope": "GAME",
+                    "defaultVisibility": "GAME",
                     "eventSchema": {
                         "type": "object"
                     }
@@ -273,7 +273,7 @@ class EventTypeControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.identifier", is(id)))
                 .andExpect(jsonPath("$.description", is("Updated test event type")))
-                .andExpect(jsonPath("$.defaultScope", is("GAME")))
+                .andExpect(jsonPath("$.defaultVisibility", is("GAME")))
                 .andExpect(jsonPath("$.eventSchema.type", is("object")));
 
         verify(gameEventTypeService, times(1))
@@ -281,7 +281,7 @@ class EventTypeControllerTest {
         verify(gameEventTypeService, times(1))
                 .updateGameEventType(eq(id), any());
         verify(gameEventTypeService, never())
-                .createGameEventType(any());
+                .createEventType(any());
     }
 
     @Test
@@ -292,12 +292,13 @@ class EventTypeControllerTest {
                 .identifier(id)
                 .description("Updated test event type")
                 .eventSchema(new JsonObject("{\"type\": \"object\"}"))
-                .defaultScope(GameEventScope.GAME)
+                .defaultVisibility(EventVisibility.GAME)
                 .build();
         String json = """
                 {
+                    "identifier": "TEST_EVENT",
                     "description": "Updated test event type",
-                    "defaultScope": "GAME",
+                    "defaultVisibility": "GAME",
                     "eventSchema": {
                         "type": "object"
                     }
@@ -315,7 +316,7 @@ class EventTypeControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.identifier", is(id)))
                 .andExpect(jsonPath("$.description", is("Updated test event type")))
-                .andExpect(jsonPath("$.defaultScope", is("GAME")))
+                .andExpect(jsonPath("$.defaultVisibility", is("GAME")))
                 .andExpect(jsonPath("$.eventSchema.type", is("object")));
 
         verify(gameEventTypeService, times(1))
@@ -336,13 +337,13 @@ class EventTypeControllerTest {
                 .identifier(id)
                 .description("Updated test event type")
                 .eventSchema(new JsonObject("{\"type\": \"object\"}"))
-                .defaultScope(GameEventScope.GAME)
+                .defaultVisibility(EventVisibility.GAME)
                 .build();
         String json = """
                 {
-                    "identifier": "NEW_EVENT3456&&asd",
+                    "identifier": "NEW_EVENT",
                     "description": "Updated test event type",
-                    "defaultScope": "GAME",
+                    "defaultVisibility": "GAME",
                     "eventSchema": {
                         "type": "object"
                     }
@@ -360,7 +361,7 @@ class EventTypeControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.identifier", is("TEST_EVENT")))
                 .andExpect(jsonPath("$.description", is("Updated test event type")))
-                .andExpect(jsonPath("$.defaultScope", is("GAME")))
+                .andExpect(jsonPath("$.defaultVisibility", is("GAME")))
                 .andExpect(jsonPath("$.eventSchema.type", is("object")));
 
         verify(gameEventTypeService, times(1))

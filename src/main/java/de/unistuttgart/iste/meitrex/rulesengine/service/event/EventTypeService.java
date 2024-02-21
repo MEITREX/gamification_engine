@@ -1,10 +1,11 @@
-package de.unistuttgart.iste.meitrex.rulesengine.service;
+package de.unistuttgart.iste.meitrex.rulesengine.service.event;
 
-import de.unistuttgart.iste.meitrex.rulesengine.dto.EventTypeDto;
+import de.unistuttgart.iste.meitrex.rulesengine.dto.event.EventTypeDto;
 import de.unistuttgart.iste.meitrex.rulesengine.exception.*;
+import de.unistuttgart.iste.meitrex.rulesengine.model.event.EventType;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.EventTypeEntity;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.EventTypeRepository;
-import de.unistuttgart.iste.meitrex.rulesengine.service.event.PredefinedEventTypes;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ public class EventTypeService {
      * @return the created game event type
      * @throws ResourceAlreadyExistsException if the game event type already exists
      */
-    public EventTypeDto createGameEventType(EventTypeDto gameEventTypeDto) {
+    public EventTypeDto createEventType(EventTypeDto gameEventTypeDto) {
         findEventTypeById(gameEventTypeDto.getIdentifier())
                 .ifPresent(entity -> {
                     throw new ResourceAlreadyExistsException(CLASS_NAME, gameEventTypeDto.getIdentifier());
@@ -61,8 +62,9 @@ public class EventTypeService {
     public EventTypeDto getGameEventTypeById(String id) {
         return findEventTypeById(id)
                 .map(EventTypeDto::from)
-                .orElseThrow(() -> new ResourceNotFoundException(CLASS_NAME, id));
+                .orElseThrow(() -> eventTypeNotFound(id));
     }
+
 
     /**
      * Updates a game event type or creates it if it does not exist.
@@ -99,9 +101,9 @@ public class EventTypeService {
         return findEventTypeById(id).isPresent();
     }
 
-    private Optional<EventTypeEntity> findEventTypeById(String id) {
-        return gameEventTypeRepository.findById(id)
-                .or(() -> PredefinedEventTypes.findById(id));
+    private Optional<EventType> findEventTypeById(String id) {
+        return PredefinedEventTypes.findById(id)
+                .or(() -> gameEventTypeRepository.findById(id));
     }
 
     private void requireNotPredefined(String id) {
@@ -109,5 +111,10 @@ public class EventTypeService {
                 .ifPresent(entity -> {
                     throw new PreDefinedModificationForbiddenException(CLASS_NAME, id);
                 });
+    }
+
+    @NotNull
+    public static ResourceNotFoundException eventTypeNotFound(String id) {
+        return new ResourceNotFoundException(CLASS_NAME, id);
     }
 }
