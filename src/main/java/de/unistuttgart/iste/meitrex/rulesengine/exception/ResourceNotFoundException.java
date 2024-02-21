@@ -15,4 +15,12 @@ public class ResourceNotFoundException extends ResponseStatusException {
     public ResourceNotFoundException(String reason) {
         super(HttpStatus.NOT_FOUND, reason);
     }
+
+    public static ResourceNotFoundException notFoundException(String entityName, Object id) {
+        return new ResourceNotFoundException(entityName, id);
+    }
+
+    public static ResourceNotFoundException notFoundException(String reason) {
+        return new ResourceNotFoundException(reason);
+    }
 }

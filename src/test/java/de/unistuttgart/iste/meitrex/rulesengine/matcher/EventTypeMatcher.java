@@ -1,19 +1,19 @@
 package de.unistuttgart.iste.meitrex.rulesengine.matcher;
 
-import de.unistuttgart.iste.meitrex.rulesengine.model.event.GameEventType;
+import de.unistuttgart.iste.meitrex.rulesengine.model.event.EventType;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
-public class EventTypeMatcher extends TypeSafeDiagnosingMatcher<GameEventType> {
+public class EventTypeMatcher extends TypeSafeDiagnosingMatcher<EventType> {
 
-    private final GameEventType expected;
+    private final EventType expected;
 
-    public EventTypeMatcher(GameEventType expected) {
+    public EventTypeMatcher(EventType expected) {
         this.expected = expected;
     }
 
     @Override
-    protected boolean matchesSafely(GameEventType item, Description description) {
+    protected boolean matchesSafely(EventType item, Description description) {
         if (!expected.getIdentifier().equals(item.getIdentifier())) {
             description.appendText("Game event type identifier was ")
                     .appendValue(item.getIdentifier());
@@ -26,9 +26,9 @@ public class EventTypeMatcher extends TypeSafeDiagnosingMatcher<GameEventType> {
             return false;
         }
 
-        if (expected.getDefaultScope() != item.getDefaultScope()) {
+        if (expected.getDefaultVisibility() != item.getDefaultVisibility()) {
             description.appendText("Game event type default scope was ")
-                    .appendValue(item.getDefaultScope());
+                    .appendValue(item.getDefaultVisibility());
             return false;
         }
 
@@ -48,12 +48,12 @@ public class EventTypeMatcher extends TypeSafeDiagnosingMatcher<GameEventType> {
                 .appendText(", description ")
                 .appendValue(expected.getDescription())
                 .appendText(", default scope ")
-                .appendValue(expected.getDefaultScope())
+                .appendValue(expected.getDefaultVisibility())
                 .appendText(", and schema ")
                 .appendValue(expected.getSchemaAsJsonObject());
     }
 
-    public static EventTypeMatcher sameEventTypeAs(GameEventType expected) {
+    public static EventTypeMatcher sameEventTypeAs(EventType expected) {
         return new EventTypeMatcher(expected);
     }
 }

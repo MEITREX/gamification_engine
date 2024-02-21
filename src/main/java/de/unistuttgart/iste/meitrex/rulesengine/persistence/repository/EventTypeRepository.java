@@ -4,6 +4,9 @@ import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.EventTypeEnti
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+
 @Repository
 public interface EventTypeRepository extends JpaRepository<EventTypeEntity, String> {
+
+
 }

@@ -1,26 +1,32 @@
-package de.unistuttgart.iste.meitrex.rulesengine.dto;
+package de.unistuttgart.iste.meitrex.rulesengine.dto.event;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.unistuttgart.iste.meitrex.rulesengine.model.event.GameEventScope;
-import de.unistuttgart.iste.meitrex.rulesengine.model.event.GameEventType;
+import de.unistuttgart.iste.meitrex.rulesengine.model.event.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.vertx.core.json.JsonObject;
 import io.vertx.json.schema.JsonSchema;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import lombok.experimental.NonFinal;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 
-@Schema(name = "GameEventTypeDto", description = "The data transfer object for a game event type")
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+@Schema(name = "GameEventTypeDto",
+        description = "The data transfer object for a game event type")
+@NonFinal
 @Value
 @With
 @Jacksonized
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 @AllArgsConstructor
-public class EventTypeDto implements GameEventType {
+public class EventTypeDto implements EventType {
 
     @Schema(description = "The name of the event type. Must be unique and only contain uppercase letters and underscores.",
             example = "PLAYER_JOINED",
-            requiredMode = Schema.RequiredMode.REQUIRED)
+            requiredMode = REQUIRED)
     @Pattern(regexp = "^[A-Z_]+$") // only uppercase letters and underscores
     @NotNull
     @NotBlank
@@ -28,7 +34,7 @@ public class EventTypeDto implements GameEventType {
 
     @Schema(description = "The description of the event type",
             example = "This event is triggered when a player joins the game",
-            requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = false,
+            requiredMode = NOT_REQUIRED, nullable = false,
             defaultValue = "")
     @NotNull
     @Builder.Default
@@ -37,20 +43,28 @@ public class EventTypeDto implements GameEventType {
     @Schema(description = "The default scope of the event type",
             example = "GAME",
             defaultValue = "GAME",
-            requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            requiredMode = NOT_REQUIRED)
     @NotNull
     @Builder.Default
-    GameEventScope defaultScope = GameEventScope.GAME;
+    EventVisibility defaultVisibility = EventVisibility.GAME;
 
     @Schema(description = "The schema of the event data. Must be a valid JSON schema of draft 2020. If not set, the event data will be unvalidated." +
                           "If set, the event data will be validated against this schema. If the validation fails, the event will not trigger rules processing.",
             example = "{\"type\": \"object\", \"properties\": {\"playerId\": {\"type\": \"string\"}, \"score\": {\"type\": \"integer\"}}}",
             defaultValue = "true",
-            requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+            requiredMode = NOT_REQUIRED,
             implementation = Object.class)
     @NotNull
     @Builder.Default
     JsonObject eventSchema = new JsonObject();
+
+    @Schema(description = "The action to be performed when the event is triggered",
+            example = "NONE",
+            defaultValue = "NONE",
+            requiredMode = NOT_REQUIRED)
+    @NotNull
+    @Builder.Default
+    ActionOnEvent action = ActionOnEvent.NONE;
 
     @Override
     @JsonIgnore
@@ -61,16 +75,21 @@ public class EventTypeDto implements GameEventType {
     @Override
     @JsonIgnore
     public JsonSchema getJsonSchema() {
-        return GameEventType.super.getJsonSchema();
+        return EventType.super.getJsonSchema();
     }
 
     @NotNull
-    public static EventTypeDto from(@NotNull GameEventType gameEventType) {
+    public static EventTypeDto from(@NotNull EventType gameEventType) {
+        if (gameEventType instanceof EventTypeDto dto) {
+            return dto;
+        }
+
         return EventTypeDto.builder()
                 .identifier(gameEventType.getIdentifier())
                 .description(gameEventType.getDescription())
-                .defaultScope(gameEventType.getDefaultScope())
                 .eventSchema(gameEventType.getSchemaAsJsonObject())
+                .defaultVisibility(gameEventType.getDefaultVisibility())
+                .action(gameEventType.getAction())
                 .build();
     }
 }

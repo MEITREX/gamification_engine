@@ -2,7 +2,6 @@ package de.unistuttgart.iste.meitrex.rulesengine.service;
 
 import de.unistuttgart.iste.meitrex.rulesengine.dto.game.CreatePlayerDto;
 import de.unistuttgart.iste.meitrex.rulesengine.dto.game.PlayerDto;
-import de.unistuttgart.iste.meitrex.rulesengine.exception.ResourceNotFoundException;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.*;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.PlayerRepository;
 import de.unistuttgart.iste.meitrex.rulesengine.service.game.PlayerService;
@@ -19,7 +18,6 @@ import static de.unistuttgart.iste.meitrex.rulesengine.matcher.PlayerMatcher.sam
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,12 +42,14 @@ class PlayerServiceTest {
                 .game(GameEntity.builder().id(gameId).build())
                 .build();
         when(playerRepository.save(any())).thenReturn(playerEntity);
+        when(playerRepository.existsById(playerId)).thenReturn(false);
 
         PlayerDto result = playerService.createPlayer(gameId, inputDto);
 
         assertThat(result, is(samePlayerAs(playerEntity)));
 
         verify(playerRepository, times(1)).save(any());
+        verify(playerRepository, atLeastOnce()).existsById(playerId);
     }
 
     @Test
@@ -88,29 +88,17 @@ class PlayerServiceTest {
                 .additionalData(JsonObject.of("key", "value"))
                 .scores(Map.of("xp", 100, "health", 200))
                 .build();
-        when(playerRepository.findById(new PlayerId(gameId, playerId)))
-                .thenReturn(Optional.of(playerEntity));
+        when(playerRepository.findByIdOrThrow(new PlayerId(gameId, playerId)))
+                .thenReturn(playerEntity);
 
         PlayerDto result = playerService.getPlayer(gameId, playerId);
 
         assertThat(result, is(samePlayerAs(playerEntity)));
 
         verify(playerRepository, times(1))
-                .findById(new PlayerId(gameId, playerId));
+                .findByIdOrThrow(new PlayerId(gameId, playerId));
     }
 
-    @Test
-    void testGetPlayerNotFound() {
-        UUID gameId = UUID.randomUUID();
-        UUID playerId = UUID.randomUUID();
-        when(playerRepository.findById(new PlayerId(gameId, playerId)))
-                .thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> playerService.getPlayer(gameId, playerId));
-
-        verify(playerRepository, times(1))
-                .findById(new PlayerId(gameId, playerId));
-    }
 
     @Test
     void testDeletePlayer() {

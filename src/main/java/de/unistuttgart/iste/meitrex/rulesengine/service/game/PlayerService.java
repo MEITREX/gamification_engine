@@ -2,7 +2,7 @@ package de.unistuttgart.iste.meitrex.rulesengine.service.game;
 
 import de.unistuttgart.iste.meitrex.rulesengine.dto.game.CreatePlayerDto;
 import de.unistuttgart.iste.meitrex.rulesengine.dto.game.PlayerDto;
-import de.unistuttgart.iste.meitrex.rulesengine.exception.ResourceNotFoundException;
+import de.unistuttgart.iste.meitrex.rulesengine.exception.ResourceAlreadyExistsException;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.PlayerEntity;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.PlayerId;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.PlayerRepository;
@@ -21,12 +21,19 @@ public class PlayerService {
     public PlayerDto createPlayer(UUID gameId, CreatePlayerDto playerDto) {
         PlayerId playerId = new PlayerId(gameId, playerDto.getUserId());
 
+        if (playerRepository.existsById(playerId)) {
+            throw new ResourceAlreadyExistsException(
+                    "Player %s in game %s already exists".formatted(playerId.getUserId(), gameId));
+        }
+
         PlayerEntity playerEntity = PlayerEntity.builder()
                 .id(playerId)
                 .name(playerDto.getName())
                 .build();
 
         playerEntity = playerRepository.save(playerEntity);
+
+        // TODO create log event that player joined
 
         return PlayerDto.from(playerEntity);
     }
@@ -38,10 +45,8 @@ public class PlayerService {
     }
 
     public PlayerDto getPlayer(UUID gameId, UUID playerId) {
-        return playerRepository.findById(new PlayerId(gameId, playerId))
-                .map(PlayerDto::from)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Player %s in game %s not found".formatted(playerId, gameId)));
+        PlayerId id = new PlayerId(gameId, playerId);
+        return PlayerDto.from(playerRepository.findByIdOrThrow(id));
     }
 
     public void deletePlayer(UUID gameId, UUID playerId) {
