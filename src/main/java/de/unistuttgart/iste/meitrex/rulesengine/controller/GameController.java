@@ -29,6 +29,8 @@ public class GameController {
 
     private final GameService gameService;
 
+    @PostMapping(consumes = "application/json", produces = "application/json")
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(
             summary = "Create a new game",
             description = "Register a new game in the system."
@@ -40,32 +42,37 @@ public class GameController {
     @ApiResponse(
             responseCode = "400",
             description = "Invalid input, e.g. the identifier is already in use.",
-            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class)))
+            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class))
+    )
     @ApiResponse(responseCode = "500", description = "Server error",
-            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class)))
-    @PostMapping(consumes = "application/json", produces = "application/json")
-    @ResponseStatus(HttpStatus.CREATED)
+            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class))
+    )
     public GameDto createGame(
-            @RequestBody @Valid CreateOrUpdateGameDto gameDto) {
+            @RequestBody @Valid
+            CreateOrUpdateGameDto gameDto
+    ) {
         return gameService.createGame(gameDto);
     }
 
+    @GetMapping(produces = "application/json")
     @Operation(summary = "Get all games")
     @ApiResponse(responseCode = "200", description = "Successful operation")
     @ApiResponse(responseCode = "500", description = "Server error",
-            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class)))
-    @GetMapping(produces = "application/json")
+            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class))
+    )
     public List<GameDto> getAllGames() {
         return gameService.getAllGames();
     }
 
+    @GetMapping(path = "/{id}", produces = "application/json")
     @Operation(summary = "Get a game by its ID")
     @ApiResponse(responseCode = "200", description = "Successful operation")
     @ApiResponse(responseCode = "404", description = "Game not found",
-            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class)))
+            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class))
+    )
     @ApiResponse(responseCode = "500", description = "Server error",
-            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class)))
-    @GetMapping(path = "/{id}", produces = "application/json")
+            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class))
+    )
     public GameDto getGameById(
             @PathVariable("id")
             @Parameter(description = "The unique identifier of the game", example = "123e4567-e89b-12d3-a456-426614174000")
@@ -74,22 +81,29 @@ public class GameController {
         return gameService.getGameById(id);
     }
 
+    @PutMapping(path = "/{id}", consumes = "application/json", produces = "application/json")
     @Operation(summary = "Update a game by its ID")
     @ApiResponse(responseCode = "200", description = "Game updated successfully")
     @ApiResponse(responseCode = "201", description = "Game created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input")
     @ApiResponse(responseCode = "500", description = "Server error",
-            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class)))
-    @PutMapping(path = "/{id}", consumes = "application/json", produces = "application/json")
+            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class))
+    )
     public ResponseEntity<GameDto> updateGame(
-            @PathVariable("id") @Parameter(description = "Identifier of the game") UUID id,
-            @RequestBody CreateOrUpdateGameDto gameDto
+
+            @PathVariable("id") @Parameter(description = "Identifier of the game")
+            UUID id,
+
+            @RequestBody @Valid
+            CreateOrUpdateGameDto gameDto
     ) {
         HttpStatus responseStatus = gameService.existsGame(id) ? HttpStatus.OK : HttpStatus.CREATED;
 
         return ResponseEntity.status(responseStatus).body(gameService.updateOrCreateGame(id, gameDto));
     }
 
+    @DeleteMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a game by its ID.")
     @ApiResponse(
             responseCode = "204",
@@ -98,9 +112,8 @@ public class GameController {
     @ApiResponse(
             responseCode = "500",
             description = "Server error",
-            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class)))
-    @DeleteMapping(path = "/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class))
+    )
     public void deleteGame(@PathVariable("id") UUID id) {
         gameService.deleteGame(id);
     }

@@ -2,7 +2,6 @@ package de.unistuttgart.iste.meitrex.rulesengine.service.game;
 
 import de.unistuttgart.iste.meitrex.rulesengine.dto.game.CreateOrUpdateGameDto;
 import de.unistuttgart.iste.meitrex.rulesengine.dto.game.GameDto;
-import de.unistuttgart.iste.meitrex.rulesengine.exception.ResourceNotFoundException;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.GameEntity;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.GameRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +32,7 @@ public class GameService {
     }
 
     public GameDto getGameById(UUID id) {
-        return gameRepository.findById(id)
-                .map(GameDto::from)
-                .orElseThrow(() -> new ResourceNotFoundException("Game", id));
+        return GameDto.from(gameRepository.findByIdOrThrow(id));
     }
 
     public boolean existsGame(UUID id) {

@@ -2,7 +2,6 @@ package de.unistuttgart.iste.meitrex.rulesengine.service;
 
 import de.unistuttgart.iste.meitrex.rulesengine.dto.game.CreateOrUpdateGameDto;
 import de.unistuttgart.iste.meitrex.rulesengine.dto.game.GameDto;
-import de.unistuttgart.iste.meitrex.rulesengine.exception.ResourceNotFoundException;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.GameEntity;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.GameRepository;
 import de.unistuttgart.iste.meitrex.rulesengine.service.game.GameService;
@@ -18,7 +17,8 @@ import java.util.*;
 import static de.unistuttgart.iste.meitrex.rulesengine.matcher.GameMatcher.sameGameAs;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
@@ -73,25 +73,14 @@ class GameServiceTest {
     void testGetGameById() {
         UUID id = UUID.randomUUID();
         GameEntity gameEntity = GameEntity.builder().id(id).name("Test Game").build();
-        when(gameRepository.findById(id)).thenReturn(Optional.of(gameEntity));
+        when(gameRepository.findByIdOrThrow(id)).thenReturn(gameEntity);
 
         GameDto result = gameService.getGameById(id);
 
         assertThat(result, sameGameAs(gameEntity));
 
-        verify(gameRepository, times(1)).findById(id);
+        verify(gameRepository, times(1)).findByIdOrThrow(id);
     }
-
-    @Test
-    void testGetGameByIdNotFound() {
-        UUID id = UUID.randomUUID();
-        when(gameRepository.findById(id)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> gameService.getGameById(id));
-
-        verify(gameRepository, times(1)).findById(id);
-    }
-
 
     @Test
     void testExistsGame() {

@@ -1,5 +1,6 @@
 package de.unistuttgart.iste.meitrex.rulesengine.persistence;
 
+import de.unistuttgart.iste.meitrex.rulesengine.exception.ResourceNotFoundException;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.*;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.GameRepository;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.PlayerRepository;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Testcontainers
@@ -106,6 +108,13 @@ class PlayerRepositoryTest {
         var players = playerRepository.findAllByIdGameId(gameId1);
 
         assertThat(players, containsInAnyOrder(playerEntity1, playerEntity2));
+    }
+
+    @Test
+    void testGetPlayerNotFound() {
+        PlayerId playerId = new PlayerId(UUID.randomUUID(), UUID.randomUUID());
+
+        assertThrows(ResourceNotFoundException.class, () -> playerRepository.findByIdOrThrow(playerId));
     }
 
     private GameEntity createGameEntity() {
