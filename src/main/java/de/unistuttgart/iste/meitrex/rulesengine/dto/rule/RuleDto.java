@@ -2,17 +2,20 @@ package de.unistuttgart.iste.meitrex.rulesengine.dto.rule;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.unistuttgart.iste.meitrex.rulesengine.model.rule.JsonSchemaRule;
+import de.unistuttgart.iste.meitrex.rulesengine.util.expression.EvaluableExpression;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.vertx.core.json.JsonObject;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.NonFinal;
 import lombok.extern.jackson.Jacksonized;
 
 import java.util.*;
 
 @Value
+@NonFinal
 @With
 @Jacksonized
 @Builder(toBuilder = true)
@@ -29,10 +32,10 @@ public class RuleDto implements JsonSchemaRule {
             example = "[\"SCORE_CHANGE\", \"COMMIT\"]")
     @NotNull
     @NotEmpty
-    Set<String> triggerEventTypes;
+    List<String> triggerEventTypes;
 
     @Schema(description = "The schema that the event data must match to trigger the rule",
-            example = "{\"type\": \"object\", \"properties\":  \"scoreNew\": {\"type\": \"integer\", \"minimum\": 100}}",
+            example = "{\"type\": \"object\", \"properties\": {  \"data\": {\"properties\": { \"message\": {\"type\": \"string\", \"minLength\": 5}}}}}",
             implementation = Object.class)
     @NotNull
     JsonObject conditionSchema;
@@ -47,8 +50,15 @@ public class RuleDto implements JsonSchemaRule {
         return Optional.ofNullable(id);
     }
 
+    @Override
+    @JsonIgnore
+    public EvaluableExpression<Boolean> getCondition() {
+        return JsonSchemaRule.super.getCondition();
+    }
+
     public static RuleDto from(JsonSchemaRule gameRule) {
         return RuleDto.builder()
+                .id(gameRule.getId())
                 .triggerEventTypes(gameRule.getTriggerEventTypes())
                 .conditionSchema(gameRule.getConditionSchema())
                 .createEventTypes(gameRule.getCreateEventTypes().stream().map(EventTypeInRuleDto::from).toList())

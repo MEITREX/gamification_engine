@@ -39,6 +39,11 @@ public class PlayerController {
             description = "Invalid input, e.g. the identifier is already in use.",
             content = @Content(schema = @Schema(implementation = SpringErrorPayload.class))
     )
+    @ApiResponse(
+            responseCode = "404",
+            description = "Game not found",
+            content = @Content(schema = @Schema(implementation = SpringErrorPayload.class))
+    )
     @ApiResponse(responseCode = "500", description = "Server error",
             content = @Content(schema = @Schema(implementation = SpringErrorPayload.class)))
     @ResponseStatus(HttpStatus.CREATED)
@@ -83,8 +88,13 @@ public class PlayerController {
     @DeleteMapping("/api/{gameId}/player/{playerId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePlayerFromGame(
-            @PathVariable("gameId") @Parameter(description = "id of the game") UUID gameId,
-            @PathVariable("playerId") @Parameter(description = "id of the player") UUID playerId) {
+
+            @PathVariable("gameId") @Parameter(description = "id of the game")
+            UUID gameId,
+
+            @PathVariable("playerId") @Parameter(description = "id of the player")
+            UUID playerId
+    ) {
         playerService.deletePlayer(gameId, playerId);
     }
 

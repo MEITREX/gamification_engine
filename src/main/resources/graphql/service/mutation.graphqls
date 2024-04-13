@@ -1,0 +1,18 @@
+type Mutation {
+    createRule(rule: RuleInput!): RuleDto!
+    updateRule(ruleId: UUID!, rule: RuleInput!): RuleDto!
+    deleteRule(ruleId: UUID!): Boolean!
+
+    createPlayerInGame(gameId: UUID!, player: PlayerInput!): PlayerDto!
+    deletePlayerFromGame(gameId: UUID!, playerId: UUID!): Boolean!
+
+    createGame(game: GameInput!): GameDto!
+    updateGame(gameId: UUID!, game: GameInput!): GameDto!
+    deleteGame(gameId: UUID!): Boolean!
+
+    createEvent(gameId: UUID!, event: GameEventInput!): GameEventDto!
+
+    createEventType(eventType: EventTypeInput!): EventTypeDto!
+    updateEventType(eventTypeId: UUID!, eventType: EventTypeInput!): EventTypeDto!
+    deleteEventType(eventTypeId: UUID!): Boolean!
+}

@@ -7,7 +7,8 @@ import io.vertx.core.json.JsonObject;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "game_rule")
@@ -26,9 +27,9 @@ public class JsonSchemaRuleEntity implements JsonSchemaRule {
 
     @Column(name = "event_types", nullable = false)
     @ElementCollection
-    private Set<String> triggerEventTypes;
+    private List<String> triggerEventTypes;
 
-    @Column(name = "condition_schema", nullable = false)
+    @Column(name = "condition_schema", nullable = false, columnDefinition = "jsonb")
     @Convert(converter = JsonObjectDbConverter.class)
     private JsonObject conditionSchema;
 

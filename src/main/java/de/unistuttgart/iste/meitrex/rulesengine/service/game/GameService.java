@@ -4,6 +4,7 @@ import de.unistuttgart.iste.meitrex.rulesengine.dto.game.CreateOrUpdateGameDto;
 import de.unistuttgart.iste.meitrex.rulesengine.dto.game.GameDto;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.GameEntity;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.GameRepository;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +26,12 @@ public class GameService {
         return GameDto.from(gameEntity);
     }
 
-    public List<GameDto> getAllGames() {
-        return gameRepository.findAll().stream()
+    public List<GameDto> getAllGames(@Nullable UUID userId) {
+        List<GameEntity> games = userId != null
+                ? gameRepository.findAllByUserId(userId)
+                : gameRepository.findAll();
+
+        return games.stream()
                 .map(GameDto::from)
                 .toList();
     }

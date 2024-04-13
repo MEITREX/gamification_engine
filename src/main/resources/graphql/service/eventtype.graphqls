@@ -1,0 +1,25 @@
+type EventTypeDto {
+    identifier: String!
+    description: String!
+    defaultVisibility: EventVisibility!
+    eventSchema: JsonObject!
+    action: ActionOnEvent!
+}
+
+enum EventVisibility {
+    GAME
+    PLAYER
+    ADMIN
+}
+
+enum ActionOnEvent {
+    NONE
+}
+
+input EventTypeInput {
+    identifier: String!
+    description: String!
+    defaultVisibility: EventVisibility!
+    eventSchema: JsonObject!
+    action: ActionOnEvent!
+}

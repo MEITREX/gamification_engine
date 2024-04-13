@@ -50,6 +50,11 @@ public class GameEntity implements Game {
     @Builder.Default
     private JsonObject additionalData = new JsonObject();
 
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<GameEventEntity> gameEvents = new ArrayList<>();
+
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

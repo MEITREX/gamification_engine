@@ -2,13 +2,14 @@ package de.unistuttgart.iste.meitrex.rulesengine.model.rule;
 
 import de.unistuttgart.iste.meitrex.rulesengine.util.expression.EvaluableExpression;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 public interface GameRule {
 
     UUID getId();
 
-    Set<String> getTriggerEventTypes();
+    List<String> getTriggerEventTypes();
 
     EvaluableExpression<Boolean> getCondition();
 

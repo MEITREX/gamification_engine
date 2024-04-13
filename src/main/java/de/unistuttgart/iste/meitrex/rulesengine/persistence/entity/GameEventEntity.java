@@ -62,12 +62,16 @@ public class GameEventEntity implements GameEvent {
     @Nullable
     private UUID playerId;
 
-    @Column(name = "game_id", nullable = false)
+    @Column(name = "game_id", nullable = true)
     @ToString.Include
     @NotNull
     private UUID gameId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "game_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private GameEntity game;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "parent_event_id", referencedColumnName = "id")
     @Nullable
     private GameEventEntity parentEvent;

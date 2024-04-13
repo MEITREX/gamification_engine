@@ -2,12 +2,13 @@ package de.unistuttgart.iste.meitrex.rulesengine.controller;
 
 import de.unistuttgart.iste.meitrex.rulesengine.dto.rule.RuleDto;
 import de.unistuttgart.iste.meitrex.rulesengine.exception.SpringErrorPayload;
-import de.unistuttgart.iste.meitrex.rulesengine.service.GameRuleService;
+import de.unistuttgart.iste.meitrex.rulesengine.service.rule.GameRuleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/rule")
+@Tag(name = "Rule", description = "Manage the rules of a game.")
 @RequiredArgsConstructor
 public class RuleController {
 
@@ -102,7 +104,8 @@ public class RuleController {
             content = @Content(schema = @Schema(implementation = SpringErrorPayload.class))
     )
     public void deleteRule(
-            @PathVariable("ruleId") @Parameter(description = "The id of the rule")
+            @PathVariable("ruleId")
+            @Parameter(description = "The id of the rule")
             UUID ruleId
     ) {
         gameRuleService.deleteRule(ruleId);
@@ -128,7 +131,8 @@ public class RuleController {
             content = @Content(schema = @Schema(implementation = SpringErrorPayload.class))
     )
     public RuleDto getRule(
-            @PathVariable("ruleId") @Parameter(description = "The id of the rule")
+            @PathVariable("ruleId")
+            @Parameter(description = "The id of the rule")
             UUID ruleId
     ) {
         return gameRuleService.getRule(ruleId);

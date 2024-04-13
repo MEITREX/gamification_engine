@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -60,8 +61,13 @@ public class GameController {
     @ApiResponse(responseCode = "500", description = "Server error",
             content = @Content(schema = @Schema(implementation = SpringErrorPayload.class))
     )
-    public List<GameDto> getAllGames() {
-        return gameService.getAllGames();
+    public List<GameDto> getAllGames(
+            @Parameter(description = "Optional filter for games of a specific user")
+            @RequestParam(name = "userId", required = false)
+            @Nullable
+            UUID userId
+    ) {
+        return gameService.getAllGames(userId);
     }
 
     @GetMapping(path = "/{id}", produces = "application/json")

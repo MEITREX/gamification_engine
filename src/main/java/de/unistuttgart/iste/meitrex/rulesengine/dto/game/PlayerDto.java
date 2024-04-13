@@ -41,7 +41,6 @@ public class PlayerDto implements Player {
     @NotNull
     UUID userId;
 
-
     @Schema(description = "Additional data of the player. Can be used to store custom data of the player.",
             example = "{\"key\": \"value\"}",
             requiredMode = Schema.RequiredMode.NOT_REQUIRED,

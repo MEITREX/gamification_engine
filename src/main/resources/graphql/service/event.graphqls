@@ -1,0 +1,26 @@
+type GameEventDto {
+    id: UUID!
+    timestamp: DateTime!
+    mostRecentChildTimestamp: DateTime!
+    eventType: EventTypeDto!
+    visibility: EventVisibility!
+    playerId: UUID
+    gameId: UUID!
+    data: JsonObject!
+    parentEventId: UUID
+    childEvents: [GameEventDto!]!
+
+    # resolved with schema mapping:
+    parentEvent: GameEventDto
+    game: GameDto!
+    player: PlayerDto
+}
+
+input GameEventInput {
+    eventType: String!
+    visibility: EventVisibility!
+    playerId: UUID
+    gameId: UUID!
+    data: JsonObject! = "{}"
+    parentEventId: UUID
+}

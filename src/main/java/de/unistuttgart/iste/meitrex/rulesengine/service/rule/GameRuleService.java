@@ -1,4 +1,4 @@
-package de.unistuttgart.iste.meitrex.rulesengine.service;
+package de.unistuttgart.iste.meitrex.rulesengine.service.rule;
 
 import de.unistuttgart.iste.meitrex.rulesengine.dto.rule.RuleDto;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.JsonSchemaRuleEntity;
@@ -37,7 +37,9 @@ public class GameRuleService {
     }
 
     public RuleDto getRule(UUID ruleId) {
-        return RuleDto.from(ruleRepository.findByIdOrThrow(ruleId));
+        JsonSchemaRuleEntity rule = ruleRepository.findByIdOrThrow(ruleId);
+
+        return RuleDto.from(rule);
     }
 
     public List<RuleDto> getAllRules() {

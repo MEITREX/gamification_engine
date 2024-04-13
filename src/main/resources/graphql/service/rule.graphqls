@@ -1,0 +1,27 @@
+type RuleDto {
+    id: UUID!
+    triggerEventTypes: [String!]!
+    conditionSchema: JsonObject!
+    createEventTypes: [EventTypeInRuleDto!]!
+}
+
+type EventTypeInRuleDto {
+    eventTypeIdentifier: String!
+    dataTemplate: JsonObject!
+}
+
+
+input RuleInput {
+    triggerEventTypes: [String!]!
+    conditionSchema: JsonObject!
+    createEventTypes: [EventTypeInRuleDtoInput!]!
+}
+
+input EventTypeInRuleDtoInput {
+    eventTypeIdentifier: String!
+    dataTemplate: JsonObject!
+}
+
+scalar JsonObject
+
+

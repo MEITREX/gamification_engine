@@ -1,12 +1,12 @@
 package de.unistuttgart.iste.meitrex.rulesengine.persistence;
 
+import de.unistuttgart.iste.meitrex.common.testutil.MeitrexPostgresSqlContainer;
 import de.unistuttgart.iste.meitrex.rulesengine.model.event.EventVisibility;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.EventTypeEntity;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.GameEventEntity;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.EventTypeRepository;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.GameEventRepository;
 import de.unistuttgart.iste.meitrex.rulesengine.service.event.PredefinedEventTypes;
-import de.unistuttgart.iste.meitrex.util.MeitrexPostgresSqlContainer;
 import io.vertx.core.json.JsonObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

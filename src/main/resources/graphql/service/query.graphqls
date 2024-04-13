@@ -1,0 +1,16 @@
+type Query {
+    rule(ruleId: ID!): RuleDto!
+    rules: [RuleDto!]!
+
+    player(gameId: UUID!, playerId: UUID!): PlayerDto!
+    players(gameId: UUID!): [PlayerDto!]!
+
+    game(gameId: UUID!): GameDto!
+    games(userId: UUID): [GameDto!]!
+
+    eventType(eventTypeId: UUID!): EventTypeDto!
+    eventTypes: [EventTypeDto!]!
+
+    eventsForGame(gameId: UUID!, pagination: Pagination): [GameEventDto!]!
+    eventsForPlayer(gameId: UUID!, playerId: UUID!, pagination: Pagination): [GameEventDto!]!
+}

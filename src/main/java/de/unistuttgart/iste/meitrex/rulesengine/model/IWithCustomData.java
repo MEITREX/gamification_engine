@@ -1,5 +1,6 @@
 package de.unistuttgart.iste.meitrex.rulesengine.model;
 
+import de.unistuttgart.iste.meitrex.rulesengine.dto.game.Score;
 import io.vertx.core.json.JsonObject;
 import jakarta.validation.constraints.NotNull;
 
@@ -28,6 +29,18 @@ public interface IWithCustomData {
      * @return the scores as a map
      */
     Map<String, Integer> getScores();
+
+    /**
+     * Returns the scores of the object as a list of score objects.
+     * Useful for graphql.
+     *
+     * @return the scores as a list
+     */
+    default List<Score> getScoresAsList() {
+        return getScores().entrySet().stream()
+                .map(entry -> new Score(entry.getKey(), entry.getValue()))
+                .toList();
+    }
 
     /**
      * Returns the flags of the object.

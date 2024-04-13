@@ -5,8 +5,10 @@ import de.unistuttgart.iste.meitrex.rulesengine.dto.game.PlayerDto;
 import de.unistuttgart.iste.meitrex.rulesengine.exception.ResourceAlreadyExistsException;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.PlayerEntity;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.entity.PlayerId;
+import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.GameRepository;
 import de.unistuttgart.iste.meitrex.rulesengine.persistence.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,9 +16,11 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PlayerService {
 
     private final PlayerRepository playerRepository;
+    private final GameRepository gameRepository;
 
     public PlayerDto createPlayer(UUID gameId, CreatePlayerDto playerDto) {
         PlayerId playerId = new PlayerId(gameId, playerDto.getUserId());
@@ -29,7 +33,10 @@ public class PlayerService {
         PlayerEntity playerEntity = PlayerEntity.builder()
                 .id(playerId)
                 .name(playerDto.getName())
+                .game(gameRepository.findByIdOrThrow(gameId))
                 .build();
+
+        log.info("Player with id {} joined game {}", playerId.getUserId(), gameId);
 
         playerEntity = playerRepository.save(playerEntity);
 
