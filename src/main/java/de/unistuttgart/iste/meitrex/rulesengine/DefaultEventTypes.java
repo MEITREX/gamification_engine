@@ -1,0 +1,52 @@
+package de.unistuttgart.iste.meitrex.rulesengine;
+
+import de.unistuttgart.iste.meitrex.generated.dto.*;
+import lombok.NoArgsConstructor;
+
+import java.util.*;
+
+@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+public class DefaultEventTypes {
+
+    public static final EventType SYSTEM_MESSAGE = DefaultEventType.builder()
+            .setIdentifier("SYSTEM_MESSAGE")
+            .setDescription("A message from the system.")
+            .setDefaultVisibility(EventVisibility.INTERNAL)
+            .setEventSchema(DefaultSchemaDefinition.builder()
+                    .setFields(
+                            List.of(
+                                    DefaultFieldSchemaDefinition.builder()
+                                            .setName("message")
+                                            .setType(AllowedDataType.STRING)
+                                            .setDescription("The message.")
+                                            .setRequired(true)
+                                            .build()))
+                    .build())
+            .setMessageTemplate("${message}")
+            .build();
+
+    public static final EventType USER_MESSAGE = DefaultEventType.builder()
+            .setIdentifier("PLAYER_MESSAGE")
+            .setDescription("A message from a user.")
+            .setDefaultVisibility(EventVisibility.PUBLIC)
+            .setEventSchema(DefaultSchemaDefinition.builder()
+                    .setFields(
+                            List.of(
+                                    DefaultFieldSchemaDefinition.builder()
+                                            .setName("message")
+                                            .setType(AllowedDataType.STRING)
+                                            .setDescription("The message.")
+                                            .setRequired(true)
+                                            .build()))
+                    .build())
+            .setMessageTemplate("${message}")
+            .build();
+
+    public static final EventType UNKNOWN = DefaultEventType.builder()
+            .setIdentifier("UNKNOWN")
+            .setDescription("An unknown event.")
+            .setDefaultVisibility(EventVisibility.INTERNAL)
+            .setEventSchema(DefaultSchemaDefinition.builder().build())
+            .setMessageTemplate("This is an unknown event.")
+            .build();
+}

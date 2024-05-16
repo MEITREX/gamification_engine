@@ -1,0 +1,139 @@
+enum EventVisibility {
+    INTERNAL
+    PRIVATE
+    PUBLIC
+}
+
+interface Event {
+    id: UUID!
+    eventType: EventType!
+    visibility: EventVisibility!
+    userId: UUID
+    visibleToUserIds: [UUID!]!
+    projectId: UUID
+    timestamp: DateTime!
+    message: String!
+    mostRecentChildTimestamp: DateTime!
+    parent: Event
+    eventData: [TemplateField!]!
+}
+
+type DefaultEvent implements Event {
+    id: UUID!
+    eventType: EventType!
+    visibility: EventVisibility!
+    userId: UUID
+    visibleToUserIds: [UUID!]!
+    projectId: UUID
+    timestamp: DateTime!
+    message: String!
+    mostRecentChildTimestamp: DateTime!
+    parent: Event
+    eventData: [DefaultTemplateField!]!
+    childrenIds: [UUID!]!
+}
+
+input CreateEventInput {
+    id: UUID
+    eventTypeIdentifier: String!
+    visibility: EventVisibility
+    timestamp: DateTime!
+    message: String
+    userId: UUID
+    projectId: UUID
+    eventData: [TemplateFieldInput!]!
+    parentId: UUID
+}
+
+interface EventType {
+    identifier: String!
+    description: String
+    defaultVisibility: EventVisibility!
+    eventSchema: SchemaDefinition!
+    messageTemplate: String!
+}
+
+type DefaultEventType implements EventType {
+    identifier: String!
+    description: String
+    defaultVisibility: EventVisibility!
+    eventSchema: SchemaDefinition!
+    messageTemplate: String!
+}
+
+interface TemplateField {
+    key: String!
+    type: AllowedDataType!
+    value: String!
+}
+
+type DefaultTemplateField implements TemplateField {
+    key: String!
+    type: AllowedDataType!
+    value: String!
+}
+
+input TemplateFieldInput {
+    key: String!
+    type: AllowedDataType!
+    value: String!
+}
+
+interface SchemaDefinition {
+    fields: [FieldSchemaDefinition!]!
+}
+
+type DefaultSchemaDefinition implements SchemaDefinition {
+    fields: [FieldSchemaDefinition!]!
+}
+
+interface FieldSchemaDefinition {
+    name: String!
+    type: AllowedDataType!
+    description: String
+    required: Boolean!
+    allowedValues: [String!]
+}
+
+type DefaultFieldSchemaDefinition implements FieldSchemaDefinition {
+    name: String!
+    type: AllowedDataType!
+    description: String
+    required: Boolean!
+    allowedValues: [String!]
+}
+
+input CreateEventTypeInput {
+    identifier: String!
+    description: String
+    defaultVisibility: EventVisibility!
+    eventSchema: SchemaDefinitionInput!
+    messageTemplate: String!
+}
+
+input UpdateEventTypeInput {
+    description: String
+    defaultVisibility: EventVisibility!
+    eventSchema: SchemaDefinitionInput!
+    messageTemplate: String!
+}
+
+input SchemaDefinitionInput {
+    fields: [FieldSchemaDefinitionInput!]!
+}
+
+input FieldSchemaDefinitionInput {
+    name: String!
+    type: AllowedDataType!
+    description: String
+    required: Boolean! = true
+    allowedValues: [String!]
+}
+
+enum AllowedDataType {
+    STRING
+    INTEGER
+    DOUBLE
+    BOOLEAN
+}
+
