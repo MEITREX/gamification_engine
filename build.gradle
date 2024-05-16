@@ -52,7 +52,8 @@ graphqlCodegen {
 	// all config options:
 	// https://github.com/kobylynskyi/graphql-java-codegen/blob/main/docs/codegen-options.md
 	graphqlSchemas {
-		rootDir = file("src/main/resources/graphql/service")
+		rootDir = file("src/main/resources/graphql")
+		includePattern = "event.graphqls"
 	}
 	outputDir = new File("$buildDir/generated")
 	packageName = "de.unistuttgart.iste.meitrex.generated.dto"
