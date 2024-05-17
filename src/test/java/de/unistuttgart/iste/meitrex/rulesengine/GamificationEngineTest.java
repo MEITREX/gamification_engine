@@ -36,8 +36,9 @@ class GamificationEngineTest {
     void setUp() {
         gamificationEngine = new GamificationEngine(eventPublisher);
 
-        when(eventPersistence.exists(any())).thenReturn(false);
-        when(eventPersistence.getEvent(any())).thenThrow(new RuntimeException("should not be invoked"));
+        when(eventPersistence.exists(any(CreateEventInput.class))).thenReturn(false);
+        when(eventPersistence.getEvent(any(CreateEventInput.class))).thenThrow(new RuntimeException(
+                "should not be invoked"));
         when(eventPersistence.persistEvent(any())).thenReturn(expectedEvent);
 
         // Mock rules

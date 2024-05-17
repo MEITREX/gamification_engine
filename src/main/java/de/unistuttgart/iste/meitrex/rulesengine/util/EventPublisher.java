@@ -1,5 +1,6 @@
 package de.unistuttgart.iste.meitrex.rulesengine.util;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -20,6 +21,7 @@ public class EventPublisher<E, R> {
     private Sinks.Many<E> sink        = initSink();
     private Flux<E>       eventStream = null;
 
+    @Getter
     private final EventPersistence<E, R> eventPersistence;
 
     /**

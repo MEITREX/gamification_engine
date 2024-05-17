@@ -1,6 +1,19 @@
 enum EventVisibility {
+    """
+    Only for admins. Not visible to users.
+    """
     INTERNAL
+    """
+    Only for the user who created the event and users in "visibleToUserIds".
+    """
     PRIVATE
+    """
+    Detail level: visible to all users but only when viewing a specific object, not in the whole list of events.
+    """
+    DETAIL
+    """
+    Project detail level: visible to all users
+    """
     PUBLIC
 }
 
