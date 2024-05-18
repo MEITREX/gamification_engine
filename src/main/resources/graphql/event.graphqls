@@ -29,6 +29,7 @@ interface Event {
     mostRecentChildTimestamp: DateTime!
     parent: Event
     eventData: [TemplateField!]!
+    children: [Event!]! @OnDemand
 }
 
 type DefaultEvent implements Event {
@@ -43,7 +44,7 @@ type DefaultEvent implements Event {
     mostRecentChildTimestamp: DateTime!
     parent: Event
     eventData: [DefaultTemplateField!]!
-    childrenIds: [UUID!]!
+    children: [Event!]! @OnDemand
 }
 
 input CreateEventInput {
