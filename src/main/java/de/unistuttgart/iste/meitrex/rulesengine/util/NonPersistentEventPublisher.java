@@ -23,7 +23,7 @@ public class NonPersistentEventPublisher<E> extends EventPublisher<E, E> {
 
         @Override
         public boolean exists(E eventRequest) {
-            return true;
+            return false;
         }
 
         @Override
