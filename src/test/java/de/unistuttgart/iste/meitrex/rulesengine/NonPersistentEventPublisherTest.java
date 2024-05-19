@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class NonPersistentEventPublisherTest {
 
     @Test
-    public void test_publishEvent_publishesEventToSubscribers() {
+    void test_publishEvent_publishesEventToSubscribers() {
         // Arrange
         NonPersistentEventPublisher<String> publisher = new NonPersistentEventPublisher<>();
         Flux<String> eventStream = publisher.getEventStream();

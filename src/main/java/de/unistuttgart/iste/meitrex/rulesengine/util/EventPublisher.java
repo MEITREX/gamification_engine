@@ -72,15 +72,7 @@ public class EventPublisher<E, R> {
     }
 
     private synchronized Flux<E> initEventStream() {
-        return sink.asFlux()
-                // recreate sink when stream is closed
-                .doFinally(signal -> sink = initSink())
-                // on error: restart sink and continue
-                .onErrorResume(e -> {
-                    log.error("Error occurred in event stream", e);
-                    sink = initSink();
-                    return initEventStream();
-                });
+        return sink.asFlux().doOnTerminate(() -> log.warn("Event stream terminated"));
     }
 
     private synchronized <T> Sinks.Many<T> initSink() {
