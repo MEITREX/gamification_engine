@@ -3,7 +3,6 @@ package de.unistuttgart.iste.meitrex.rulesengine;
 import de.unistuttgart.iste.meitrex.generated.dto.CreateEventInput;
 import de.unistuttgart.iste.meitrex.generated.dto.Event;
 import de.unistuttgart.iste.meitrex.rulesengine.util.EventPublisher;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,6 @@ import java.text.MessageFormat;
 @Setter
 @Getter
 @Slf4j
-@AllArgsConstructor
 public class GamificationEngine {
 
     /**
@@ -43,6 +41,18 @@ public class GamificationEngine {
      */
     public GamificationEngine(EventPublisher<Event, CreateEventInput> eventPublisher) {
         this.eventPublisher = eventPublisher;
+        initialize();
+    }
+
+    /**
+     * Constructs a new GamificationEngine with the given EventPublisher, RuleRegistry, and EventTypeRegistry.
+     */
+    public GamificationEngine(EventPublisher<Event, CreateEventInput> eventPublisher,
+            RuleRegistry ruleRegistry,
+            EventTypeRegistry eventTypeRegistry) {
+        this.eventPublisher = eventPublisher;
+        this.ruleRegistry = ruleRegistry;
+        this.eventTypeRegistry = eventTypeRegistry;
         initialize();
     }
 
