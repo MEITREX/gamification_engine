@@ -8,7 +8,7 @@ import java.util.*;
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class DefaultEventTypes {
 
-    public static final EventType SYSTEM_MESSAGE = DefaultEventType.builder()
+    public static final DefaultEventType SYSTEM_MESSAGE = DefaultEventType.builder()
             .setIdentifier("SYSTEM_MESSAGE")
             .setDescription("A message from the system.")
             .setDefaultVisibility(EventVisibility.INTERNAL)
@@ -25,7 +25,7 @@ public class DefaultEventTypes {
             .setMessageTemplate("${message}")
             .build();
 
-    public static final EventType USER_MESSAGE = DefaultEventType.builder()
+    public static final DefaultEventType USER_MESSAGE = DefaultEventType.builder()
             .setIdentifier("PLAYER_MESSAGE")
             .setDescription("A message from a user.")
             .setDefaultVisibility(EventVisibility.PUBLIC)
@@ -42,7 +42,7 @@ public class DefaultEventTypes {
             .setMessageTemplate("${message}")
             .build();
 
-    public static final EventType UNKNOWN = DefaultEventType.builder()
+    public static final DefaultEventType UNKNOWN = DefaultEventType.builder()
             .setIdentifier("UNKNOWN")
             .setDescription("An unknown event.")
             .setDefaultVisibility(EventVisibility.INTERNAL)
