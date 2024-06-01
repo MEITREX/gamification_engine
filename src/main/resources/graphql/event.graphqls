@@ -78,19 +78,19 @@ type DefaultEventType implements EventType {
 interface TemplateField {
     key: String!
     type: AllowedDataType!
-    value: String!
+    value: String
 }
 
 type DefaultTemplateField implements TemplateField {
     key: String!
     type: AllowedDataType!
-    value: String!
+    value: String
 }
 
 input TemplateFieldInput {
     key: String!
     type: AllowedDataType!
-    value: String!
+    value: String
 }
 
 interface SchemaDefinition {
