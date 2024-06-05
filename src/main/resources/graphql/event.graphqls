@@ -57,6 +57,7 @@ input CreateEventInput {
     projectId: UUID
     eventData: [TemplateFieldInput!]!
     parentId: UUID
+    visibleToUserIds: [UUID!] = []
 }
 
 interface EventType {

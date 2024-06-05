@@ -17,7 +17,11 @@ public interface Rule {
      *
      * @return the unique ID of the rule
      */
-    UUID getId();
+    default UUID getId() {
+        // return a fixed UUID dependent on the class name
+        // sub-classes might override this method to return a different UUID
+        return UUID.nameUUIDFromBytes(getClass().getName().getBytes());
+    }
 
     /**
      * Retrieves the identifiers of the event types that can trigger this rule.

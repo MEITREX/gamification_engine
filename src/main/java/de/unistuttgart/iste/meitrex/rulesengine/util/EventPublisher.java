@@ -18,8 +18,8 @@ import reactor.core.publisher.Sinks;
 @RequiredArgsConstructor
 public class EventPublisher<E, R> {
 
-    private Sinks.Many<E> sink        = initSink();
-    private Flux<E>       eventStream = null;
+    private final Sinks.Many<E> sink        = initSink();
+    private       Flux<E>       eventStream = null;
 
     @Getter
     private final EventPersistence<E, R> eventPersistence;
