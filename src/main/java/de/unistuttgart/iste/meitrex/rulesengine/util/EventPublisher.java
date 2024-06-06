@@ -18,8 +18,8 @@ import reactor.core.publisher.Sinks;
 @RequiredArgsConstructor
 public class EventPublisher<E, R> {
 
-    private final Sinks.Many<E> sink        = initSink();
-    private       Flux<E>       eventStream = null;
+    private Sinks.Many<E> sink        = initSink();
+    private Flux<E>       eventStream = null;
 
     @Getter
     private final EventPersistence<E, R> eventPersistence;
@@ -72,7 +72,12 @@ public class EventPublisher<E, R> {
     }
 
     private synchronized Flux<E> initEventStream() {
-        return sink.asFlux().doOnTerminate(() -> log.warn("Event stream terminated"));
+        return sink.asFlux()
+                .doOnError(e -> log.error("Error occurred in event stream", e))
+                .doOnTerminate(() -> {
+                    log.warn("Event stream terminated");
+                    sink = initSink();
+                });
     }
 
     private synchronized <T> Sinks.Many<T> initSink() {
