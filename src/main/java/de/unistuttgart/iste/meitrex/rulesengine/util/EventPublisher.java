@@ -18,8 +18,8 @@ import reactor.core.publisher.Sinks;
 @RequiredArgsConstructor
 public class EventPublisher<E, R> {
 
-    private final Sinks.Many<E> sink        = initSink();
-    private       Flux<E>       eventStream = null;
+    private Sinks.Many<E> sink        = initSink();
+    private Flux<E>       eventStream = null;
 
     @Getter
     private final EventPersistence<E, R> eventPersistence;
@@ -32,7 +32,7 @@ public class EventPublisher<E, R> {
      * @param eventRequest the event request to publish
      * @return the published or retrieved event
      */
-    public E publishEvent(R eventRequest) {
+    public synchronized E publishEvent(R eventRequest) {
         if (eventPersistence.exists(eventRequest)) {
             return eventPersistence.getEvent(eventRequest);
         }
@@ -40,16 +40,22 @@ public class EventPublisher<E, R> {
         E event = eventPersistence.persistEvent(eventRequest);
 
         Sinks.EmitResult result = emitRetryOnFail(event);
-
         if (result.isFailure()) {
-            if (result == Sinks.EmitResult.FAIL_ZERO_SUBSCRIBER) {
-                log.debug("Trying to emit event without subscribers");
-            } else {
-                log.error("Failed to emit event");
-            }
+            logFailure(result);
         }
 
         return event;
+    }
+
+    private void logFailure(Sinks.EmitResult emitResult) {
+        switch (emitResult) {
+            case FAIL_ZERO_SUBSCRIBER -> log.warn("Trying to emit event without subscribers");
+            case FAIL_NON_SERIALIZED -> log.error("Failed to emit event due to non-serialized sink");
+            case FAIL_CANCELLED -> log.error("Failed to emit event due to cancelled sink");
+            case FAIL_OVERFLOW -> log.error("Failed to emit event because the sink has no buffer space");
+            case FAIL_TERMINATED -> log.error("Failed to emit event because the sink has been terminated");
+            default -> log.error("Failed to emit event due to unknown error");
+        }
     }
 
     /**
@@ -72,7 +78,12 @@ public class EventPublisher<E, R> {
     }
 
     private synchronized Flux<E> initEventStream() {
-        return sink.asFlux().doOnTerminate(() -> log.warn("Event stream terminated"));
+        return sink.asFlux()
+                .doOnError(e -> log.error("Error occurred in event stream", e))
+                .doOnTerminate(() -> {
+                    log.warn("Event stream terminated");
+                    sink = initSink();
+                });
     }
 
     private synchronized <T> Sinks.Many<T> initSink() {
@@ -82,7 +93,7 @@ public class EventPublisher<E, R> {
         return Sinks.many().multicast().onBackpressureBuffer();
     }
 
-    private Sinks.EmitResult emitRetryOnFail(E event) {
+    private synchronized Sinks.EmitResult emitRetryOnFail(E event) {
         Sinks.EmitResult result = sink.tryEmitNext(event);
 
         if (result.isFailure() && result != Sinks.EmitResult.FAIL_ZERO_SUBSCRIBER) {
