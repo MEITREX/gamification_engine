@@ -1,5 +1,6 @@
 package de.unistuttgart.iste.meitrex.rulesengine.util;
 
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import reactor.core.publisher.Sinks;
 public class EventPublisher<E, R> {
 
     private Sinks.Many<E> sink        = initSink();
+    @Nullable
     private Flux<E>       eventStream = null;
 
     @Getter
@@ -72,18 +74,21 @@ public class EventPublisher<E, R> {
      */
     public synchronized Flux<E> getEventStream() {
         if (eventStream == null) {
-            eventStream = initEventStream();
+            eventStream = sink.asFlux();
+            // we add a subscriber to the event stream to ensure that the stream is active
+            // otherwise, the event sink would complete when the subscriber count reaches zero
+            //noinspection CallingSubscribeInNonBlockingScope
+            eventStream.subscribe(
+                    event -> log.trace("Received event: {}", event),
+                    error -> log.error("Error occurred", error),
+                    () -> {
+                        eventStream = null;
+                        sink = initSink();
+                        log.warn("Event stream completed");
+                    }
+            );
         }
         return eventStream;
-    }
-
-    private synchronized Flux<E> initEventStream() {
-        return sink.asFlux()
-                .doOnError(e -> log.error("Error occurred in event stream", e))
-                .doOnTerminate(() -> {
-                    log.warn("Event stream terminated");
-                    sink = initSink();
-                });
     }
 
     private synchronized <T> Sinks.Many<T> initSink() {
